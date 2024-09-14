@@ -41,17 +41,12 @@ function raster_both_populations(
         plot(p1, p2, layout = (2, 1))
     end
     plot!(; kwargs...)
-    plot!(size=(1200,800))
+    plot!(size = (1200, 800))
     return p
 end
 
 
-function plot_sequence(
-    seq::Encoding,
-    interval::AbstractVector;
-    target = "phs",
-    kwargs...,
-)
+function plot_sequence(seq::Encoding, interval::AbstractVector; target = "phs", kwargs...)
 
     ## Get the words or phs population
     if target == "words"
@@ -86,9 +81,9 @@ function plot_sequence(
     plot!(yticks = (cumsum(lengths) .- mean(lengths) / 2, labels))
     plot!(xlims = interval, ylabel = target * " pops")
     plot!(xticks = (range(interval..., 5), range(interval..., 5) ./ 1000))
-    plot!(legend=false)
+    plot!(legend = false)
 end
-  
+
 
 function raster_populations(
     spikes::Vector{NNSpikes},

@@ -10,7 +10,7 @@ end
 
 MPI_colors = []
 _names = []
-path=  joinpath(@__DIR__, "MPI_palette.xlsx")
+path = joinpath(@__DIR__, "MPI_palette.xlsx")
 XLSX.openxlsx(path, enable_cache = false) do f
     sheet = f["Sheet1"]
     for r in XLSX.eachrow(sheet)
@@ -31,4 +31,6 @@ end
 
 mpi_colors = Dict{String,MPIColor}(zip(_names, MPI_colors)) |> dict2ntuple
 
-export mpi_colors
+mpi_palette = palette(vcat([c.full for c in mpi_colors], [c.tint for c in mpi_colors]))
+
+export mpi_colors, mpi_palette
