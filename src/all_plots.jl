@@ -18,7 +18,7 @@ function make_plot(path)
 
     pop_weights = joinpath(analysis_path, "pop_weights.jld")
     wd1 = JLD.load(pop_weights, "d1")
-    wd2 = JLD.load(pop_weights, "d2")
+    wd2 = JLD.load(pop_weights, :d2)
     _m = minimum([wd1[:]; wd2[:]])
     _M = maximum([wd1[:]; wd2[:]])
     ww = length(get_words(seq))

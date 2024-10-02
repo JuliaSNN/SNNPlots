@@ -91,7 +91,7 @@ function plot_voltage(
         p1 = plot!(ax)
         plot!(xs, voltage[index, 2, :], label = "d1")
         plot!(xs, voltage[index, 1, :], c = :black, label = "s")
-        plot!(xs, voltage[index, 3, :], label = "d2")
+        plot!(xs, voltage[index, 3, :], label = :d2)
         plot!(xs, voltage[index, 1, :], c = :black, label = "s")
         for (x_stim, y_stim, cbars) in stimuli
             plot!(x_stim, y_stim, c = cbars, lw = 8, label = "")
