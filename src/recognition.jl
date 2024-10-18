@@ -29,7 +29,7 @@ function plot_confusion_matrix(sample; delay = 100, unique = false)
         unique = unique,
     )
     words = [seq.mapping[x] for x in get_words(seq)]
-    z = zeros(100, 1) |> x -> ([x[n, 1] = n / 100 for n = 1:100]; x)
+    z = zeros(100, 1) |> x -> ([x[n, 1] in n / 100 for n = 1:100]; x)
     h = heatmap(
         z,
         colorbar = false,

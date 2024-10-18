@@ -93,7 +93,7 @@ function make_plot(path)
         plots = []
         ll = length(network)
         for _w in w_name
-            for x = 1:ll÷6:ll-ll÷6
+            for x = 1:(ll÷6):(ll-ll÷6)
                 push!(
                     plots,
                     histogram(

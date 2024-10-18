@@ -135,6 +135,6 @@ end
 
 function cap_voltage(v)
     vv = copy(v)
-    vv[v.>TN.AdEx.θ] .= TN.AdEx.θ
+    vv[v .> TN.AdEx.θ] .= TN.AdEx.θ
     return vv
 end

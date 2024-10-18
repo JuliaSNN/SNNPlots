@@ -25,7 +25,7 @@ function plot_rates(rates::Vector{Any}; ax = plot(), tt0 = 0, kwargs...)
         exc = runmean(vcat(exc, rate[2][1:50:end]), 40)
         sst = runmean(vcat(sst, rate[3][1:50:end]), 40)
         pv = runmean(vcat(pv, rate[4][1:50:end]), 40)
-        xs = vcat(xs, [1+tts[n]:5:tts[n+1]...])
+        xs = vcat(xs, [(1+tts[n]):5:tts[n+1]...])
     end
     # return xs, exc, sst, pv
     p = plot!(ax)
