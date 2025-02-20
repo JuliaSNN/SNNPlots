@@ -1,8 +1,12 @@
 using PlotlyJS
 using ElectronDisplay
 using JLD2
-function sankey_applied()
-    @load "sankey_data.jld" pre_layer_names post_layer_names connections labels
+function sankey_applied(from_jld=true)
+    if from_jld
+        @load "sankey_data.jld" pre_layer_names post_layer_names connections labels
+    else
+        println("implement connectome creating code here."))
+    end
     sankey_trace = sankey(
         arrangement = "snap",
         node = attr(
@@ -20,4 +24,3 @@ function sankey_applied()
     plt = plot(sankey_trace)
     ElectronDisplay.display(plt)  # opens a new Electron window
 end
-sankey_applied()
