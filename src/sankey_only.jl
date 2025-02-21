@@ -12,6 +12,10 @@ function sankey_applied(from_jld=true)
     else
         throw("implement connectome creating code here."))
     end
+    if isa(connections, Vector{<:Vector})
+        connections = hcat(connections...)
+        @save "sankey_data.jld" connections 
+    end
     sankey_trace = sankey(
         arrangement = "snap",
         node = attr(
@@ -20,11 +24,20 @@ function sankey_applied(from_jld=true)
             thickness = 20,
             line     = attr(color = "black", width = 0.5)
         ),
-        link = attr(
-            source = [i[1] for i in connections],
-            target = [i[2] for i in connections],
-            value  = [i[3] for i in connections]
-        )
+        if isa(connections, Vector{<:Vector})
+
+            link = attr(
+                source = [i[1] for i in connections],
+                target = [i[2] for i in connections],
+                value  = [i[3] for i in connections]
+                )
+        else
+            link = attr(
+                source = connections[:, 1],  # First column for source
+                target = connections[:, 2],  # Second column for target
+                value  = connections[:, 3]   # Third column for value
+            )
+        end
     )
     plt = plot(sankey_trace)
     ElectronDisplay.display(plt)  # opens a new Electron window

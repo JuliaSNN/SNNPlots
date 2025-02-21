@@ -12,6 +12,7 @@ using DrWatson
 include("load_MPI_palette.jl")
 include("conversion.jl")
 include("utils.jl")
+# include("parallel_coordinates.jl")
 # include("default_plots.jl")
 # include("src/utils.jl")
 # include("src/raster.jl")
