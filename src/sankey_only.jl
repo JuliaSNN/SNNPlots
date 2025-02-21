@@ -10,7 +10,7 @@ function sankey_applied(from_jld=true)
     if from_jld
         @load "sankey_data.jld" _ _ connections _
     else
-        throw("implement connectome creating code here."))
+        throw("implement connectome creating code here.")
     end
     if isa(connections, Vector{<:Vector})
         connections = hcat(connections...)
