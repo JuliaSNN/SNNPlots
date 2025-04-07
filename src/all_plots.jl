@@ -3,8 +3,8 @@ function make_plot(path)
     stim, seq, net, dends, learn, store = load_params(path)
     network = load_weights(store.data)
     spikes = load_spikes(store.data)
-    analysis_path = get_path(store, "analysis")
-    plot_path = get_path(store, "plots")
+    analysis_path = model_path_name(store, "analysis")
+    plot_path = model_path_name(store, "plots")
 
 
     t = length(spikes) - 10
