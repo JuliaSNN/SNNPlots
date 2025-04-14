@@ -5,7 +5,7 @@ using Random, UnPack, Revise, YAML, Plots
 using TripodNetwork
 
 Random.seed!(1337)
-conf = YAML.load_file(joinpath(projectdir(), "conf/paths.yml"))
+conf = YAML.load_file(joinpath(projectdir(), "conf/paths.yaml"))
 data = conf["dataset_path"]
 path = joinpath(data, "test/lkd_soma")
 
