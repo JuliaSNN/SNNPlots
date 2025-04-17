@@ -13,7 +13,6 @@ module SNNPlots
     include("extra_plots.jl")
     include("stdp_plots.jl")
 
-    # include("load_MPI_palette.jl")
     # include("conversion.jl")
     # include("utils.jl")
     # include("default_plots.jl")
@@ -35,10 +34,3 @@ module SNNPlots
 
 
 end
-# include("dataframes.jl")
-# include("rate.jl")
-# include("weights.jl")
-# include("colors.jl")
-# include("all_plots.jl")
-# include("track_neurons.jl")
-
