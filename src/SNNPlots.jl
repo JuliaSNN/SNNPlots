@@ -4,7 +4,10 @@ module SNNPlots
     using ColorSchemes
     using LaTeXStrings
     using Measures
-    using XLSX
+    using SpikingNeuralNetworks
+    import SpikingNeuralNetworks: AbstractPopulation, AbstractStimulus, AbstractConnection
+    using UnPack
+    using Parameters
 
     include("plot.jl")
     include("extra_plots.jl")
@@ -38,17 +41,4 @@ end
 # include("colors.jl")
 # include("all_plots.jl")
 # include("track_neurons.jl")
-
-
-# default(legendfontsize=12, bglegend=:transparent, fglegend=:transparent,grid=false, guidefontsize = 18, tickfontsize=13, frame=:axes )
-# pyplot()
-
-
-# macro makeplot(p, folder,name)
-#     return :( $p,savefig( joinpath($folder,$name *".pdf")) )
-# end
-
-
-function __init__()
-end
 
