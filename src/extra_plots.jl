@@ -285,7 +285,7 @@ function plot_weights(network)
     W = network.syn.I1_to_E.W
     h_I1E = histogram(
         W,
-        bins = minimum(W):maximum(W)/200:maximum(W)+1,
+        bins = minimum(W):(maximum(W)/200):(maximum(W)+1),
         title = "Synaptic weights from I1 to E",
         xlabel = "Synaptic weight",
         ylabel = "Number of synapses",
@@ -295,7 +295,7 @@ function plot_weights(network)
     W = network.syn.I2_to_E.W
     h_I2E = histogram(
         W,
-        bins = minimum(W):maximum(W)/200:maximum(W)+1,
+        bins = minimum(W):(maximum(W)/200):(maximum(W)+1),
         title = "Synaptic weights from I2 to E",
         xlabel = "Synaptic weight",
         ylabel = "Number of synapses",
@@ -347,7 +347,7 @@ function stp_plot(model, interval, assemblies, stimuli = []; every = 10)
     w, r_t = SNN.interpolated_record(syn.EE, :W)
     weff = ρ .* w ./ maximum(w)
     in_assembly = 1:length(indices(syn.EE, assemblies[1].neurons, assemblies[1].neurons))
-    out_assembly = length(in_assembly)+1:size(weff, 1)
+    out_assembly = (length(in_assembly)+1):size(weff, 1)
     p12 = SNN.raster(pop, interval, yrotation = 90, every = 10)
     p11 = plot(
         SNN.vecplot(
@@ -462,7 +462,7 @@ function stp_plot(model, interval, assemblies, stimuli = []; every = 10)
     plot!(p3, ylims = (0, 1), legend = :topleft, ylabel = "STP")
     p23 = plot(p2, p3)
     in_ass = [a.neurons for a in assemblies]
-    push!(in_ass, (pop.E.N-length(assemblies[1].neurons):pop.E.N))
+    push!(in_ass, ((pop.E.N-length(assemblies[1].neurons)):pop.E.N))
     p = plot()
     rectangle(_start, _end) = Shape(
         [_start, _start, _end, _end],
@@ -526,7 +526,7 @@ function plot_average_word_activity(
 )
     membrane, r_v = SNN.interpolated_record(model.pop.E, sym)
     myintervals = sign_intervals(word, seq)
-    Trange = -before:1ms:diff(myintervals[1])[1]+after
+    Trange = (-before):1ms:(diff(myintervals[1])[1]+after)
     activity = zeros(length(seq.symbols.words), size(Trange, 1))
     for w in eachindex(seq.symbols.words)
         neurons = getneurons(model.stim, seq.symbols.words[w], :d)
@@ -534,7 +534,7 @@ function plot_average_word_activity(
         std_fr = std(membrane[neurons, :])
         n = 0
         for myinterval in myintervals
-            _range = myinterval[1]-before:1ms:myinterval[2]+after
+            _range = (myinterval[1]-before):1ms:(myinterval[2]+after)
             _range[end] > r_v[end] && continue
             v = mean(membrane[neurons, _range], dims = 1)[1, :]
             activity[w, :] += zscore ? (v .- ave_fr) ./ std_fr : v
@@ -755,7 +755,7 @@ function mutual_EI_connections(synapses, forward = :I1_to_E, feedback = :E_to_I1
         @unpack I, colptr = feedback_conn
         @unpack W = forward_conn
         inh_pre, exc_j = forward_conn.J[s], forward_conn.I[s]
-        all_inh_posts = I[colptr[exc_j]:colptr[exc_j+1]-1]
+        all_inh_posts = I[colptr[exc_j]:(colptr[exc_j+1]-1)]
         if inh_pre in all_inh_posts
             push!(mutual, W[s])
         else

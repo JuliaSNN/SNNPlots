@@ -69,7 +69,7 @@ function raster!(
         label = "",
     )
     !isnothing(t) && plot!(xlims = t ./ s)
-    plot!(yticks = (cumsum(y0)[1:end-1] .+ (y0./2)[2:end], names), yrotation = 45)
+    plot!(yticks = (cumsum(y0)[1:(end-1)] .+ (y0 ./ 2)[2:end], names), yrotation = 45)
     y0 = y0[2:(end-1)]
     !isempty(y0) && hline!(plt, cumsum(y0), linecolor = :red, label = "")
     plot!(plt; kwargs...)
@@ -126,7 +126,10 @@ end
 
 
 
-function _raster(p::T, interval = nothing) where {T<:Union{AbstractPopulation, AbstractStimulus}}
+function _raster(
+    p::T,
+    interval = nothing,
+) where {T<:Union{AbstractPopulation,AbstractStimulus}}
     !haskey(p.records, :fire) && @error "No fire record found in population $(p.name)"
     fire = p.records[:fire]
     x, y = Float32[], Float32[]
@@ -154,9 +157,9 @@ end
 function vecplot(p, sym::Vector{Symbol}; kwargs...)
     my_plot = plot()
     for s in sym
-        vecplot!(my_plot, p, s; label=string(s), kwargs...)
+        vecplot!(my_plot, p, s; label = string(s), kwargs...)
     end
-    plot!(my_plot, ylims=:auto)
+    plot!(my_plot, ylims = :auto)
     return my_plot
 end
 
@@ -234,13 +237,25 @@ export raster, raster!, vecplot, vecplot!
 
 ##
 
-function raster_firing(model; path=nothing, τ=20ms, every=1)
-    fr_average, r, labels = firing_rate(model.pop, interval=0s:get_time(model), τ=τ, pop_average=true)
-    pr = raster(model.pop, (get_time(model)-5s):get_time(model), every=every, size=(1200, 1000))
-    pf = plot(r, fr_average, labels=hcat(labels...), xlabel="Time (s)", ylabel="Firing rate (Hz)")
-    presults = plot(pr, pf, layout=(2,1))
+function raster_firing(model; path = nothing, τ = 20ms, every = 1)
+    fr_average, r, labels =
+        firing_rate(model.pop, interval = 0s:get_time(model), τ = τ, pop_average = true)
+    pr = raster(
+        model.pop,
+        (get_time(model)-5s):get_time(model),
+        every = every,
+        size = (1200, 1000),
+    )
+    pf = plot(
+        r,
+        fr_average,
+        labels = hcat(labels...),
+        xlabel = "Time (s)",
+        ylabel = "Firing rate (Hz)",
+    )
+    presults = plot(pr, pf, layout = (2, 1))
     if !isnothing(path)
-        savefig(presults, path)        
+        savefig(presults, path)
     end
 end
 
