@@ -1,4 +1,4 @@
-using .Plots, Statistics
+using .Plots 
 
 ## Raster plot
 
@@ -6,7 +6,7 @@ using .Plots, Statistics
 function raster(spiketimes::Spiketimes, t = nothing, kwargs...)
     t = isnothing(t) ? [0, maximum(vcat(spiketimes...))] : t
     X, Y = _raster(spiketimes, t)
-    X, Y = _resample_spikes(X, Y)
+    X, Y = SNN.resample_spikes(X, Y)
     plt = scatter(
         X,
         Y,
@@ -55,7 +55,7 @@ function raster!(
     end
     names = isnothing(names) ? ["pop_$i" for i = 1:length(P)] : names
 
-    X, Y = _resample_spikes(X, Y)
+    X, Y = SNN.resample_spikes(X, Y)
     X = X ./ s
 
     plt = scatter!(
@@ -112,17 +112,7 @@ function _raster(spiketimes::Spiketimes, t = nothing)
     return X, Y
 end
 
-function _resample_spikes(X, Y)
-    if length(X) > 200_000
-        s = ceil(Int, length(X) / 200_000)
-        points = Vector{Int}(eachindex(X))
-        points = sample(points, 200_000, replace = false)
-        X = X[points]
-        Y = Y[points]
-        @warn "Subsampling raster plot, 1 out of $s spikes"
-    end
-    return X, Y
-end
+
 
 
 
