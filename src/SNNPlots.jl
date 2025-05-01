@@ -32,6 +32,7 @@ default(margins = 5Plots.mm)
 
 export SNNPlots, Plots
 export plot, plot!
+export doparallelCoords_optimized
 
 end
 # include("dataframes.jl")
