@@ -180,7 +180,7 @@ function vecplot!(
     kwargs...,
 )
     # get the record and its sampling rate
-    y, r_v = interpolated_record(p, sym)
+    y, r_v = SNN.interpolated_record(p, sym)
     r = isnothing(interval) ? r : interval
     r = _match_r(r, r_v)
 
@@ -200,8 +200,8 @@ function vecplot!(
         y = y[neurons, r]
     end
 
-    ribbon = pop_average ? std(y, dims = 1) : nothing
-    y = pop_average ? mean(y, dims = 1) : y
+    ribbon = pop_average ? SNN.Statistics.std(y, dims = 1) : nothing
+    y = pop_average ? SNN.Statistics.mean(y, dims = 1) : y
 
     @info "Vector plot in: $(r[1])ms to $(round(Int, r[end]))ms"
     return plot!(
