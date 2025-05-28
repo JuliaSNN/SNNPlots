@@ -25,6 +25,7 @@ function raster(P, t = nothing; kwargs...)
     raster!(plot(), P, t; kwargs...)
 end
 
+
 function raster!(
     p,
     P,
@@ -33,6 +34,7 @@ function raster!(
     populations = nothing,
     names = nothing,
     every = 1,
+    order::Vector = [],
     kwargs...,
 )
     t = t[[1, end]]
@@ -43,7 +45,7 @@ function raster!(
         names = Vector{String}()
         P = typeof(P) <: AbstractPopulation ? [P] : [getfield(P, k) for k in keys(P)]
         for p in P
-            x, y, _y0 = _raster(p, t)
+            x, y, _y0 = _raster(p, t; order)
             push!(names, p.name)
             append!(X, x)
             append!(Y, y .+ sum(y0))
@@ -52,8 +54,8 @@ function raster!(
     else
         @assert typeof(P) <: AbstractPopulation
         X, Y, y0 = _raster_populations(P, t; populations = populations)
+        names = isnothing(names) ? ["pop_$i" for i = 1:length(P)] : names
     end
-    names = isnothing(names) ? ["pop_$i" for i = 1:length(P)] : names
 
     X, Y = SNN.resample_spikes(X, Y)
     X = X ./ s
@@ -99,9 +101,10 @@ function _raster_populations(
     return x, y, y0
 end
 
-function _raster(spiketimes::Spiketimes, t = nothing)
+function _raster(spiketimes::Spiketimes, t = nothing; order=[])
     t, X, Y = t[[1, end]], Float32[], Float32[]
-    for n in eachindex(spiketimes)
+    order = isempty(order) ? eachindex(spiketimes) : order
+    for n in order
         for st in spiketimes[n]
             if isnothing(st) || (st > t[1] && st < t[2])
                 push!(X, st)
@@ -118,7 +121,8 @@ end
 
 function _raster(
     p::T,
-    interval = nothing,
+    interval = nothing;
+    order=[]
 ) where {T<:Union{AbstractPopulation,AbstractStimulus}}
     !haskey(p.records, :fire) && @error "No fire record found in population $(p.name)"
     fire = p.records[:fire]
@@ -131,7 +135,11 @@ function _raster(
         for n in fire[:neurons][i]
             if isnothing(interval) || (t > interval[1] && t < interval[2])
                 push!(x, t)
-                push!(y, n)
+                if !isempty(order) 
+                    push!(y, indexin(n, order)[1])
+                else
+                    push!(y, n)
+                end
             end
         end
     end
@@ -140,7 +148,7 @@ end
 
 ## Vector plot
 
-function vecplot(p, sym; kwargs...)
+function vecplot(p, sym::Symbol; kwargs...)
     vecplot!(plot(), p, sym; kwargs...)
 end
 
@@ -158,6 +166,12 @@ function vecplot(P::Array, sym; kwargs...)
     N = length(plts)
     plot(plts..., size = (600, 400N), layout = (N, 1))
 end
+
+vecplot(p, sym, interval::T; kwargs...) where {T<:AbstractRange} = vecplot(p, sym; interval = interval, kwargs...) 
+
+vecplot!(    my_plot,    p,    sym::Symbol,    interval::T;) where {T<:AbstractRange} = vecplot!(    my_plot, p,    sym;    interval = interval,    kwargs...) 
+
+
 
 function _match_r(r, r_v)
     r = isnothing(r) ? range(r_v[1], r_v[end]) : r
@@ -222,6 +236,9 @@ function vecplot(P, syms::Array; kwargs...)
     N = length(plts)
     plot(plts..., size = (600, 400N), layout = (N, 1))
 end
+
+
+
 
 export raster, raster!, vecplot, vecplot!
 
