@@ -13,6 +13,7 @@ SNN.@load_units
 include("plot.jl")
 include("extra_plots.jl")
 include("stdp_plots.jl")
+include("spatial.jl")
 
 # include("conversion.jl")
 # include("utils.jl")
