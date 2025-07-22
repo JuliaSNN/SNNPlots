@@ -57,7 +57,7 @@ function dendrite_gplot(
                 if nmda > 0.0
                     curr[n, r, i] =
                         -gsyn * g[n, r, i] * (v[n, i] - E_rev) /
-                        (1.0f0 + (mg / b) * SNN.exp32(k * v[n, i]))
+                        (1.0f0 + (mg / b) * SNN.exp(k * v[n, i]))
                 else
                     curr[n, r, i] = -gsyn * g[n, r, i] * (v[n, i] - E_rev)
                 end
@@ -807,7 +807,7 @@ export plot_network_plasticity, mutual_EI_connections
 #     #         @unpack gsyn, E_rev, nmda = syn[r]
 #     #         for n in axes(g,1)
 #     #             if nmda > 0.
-#     #                 curr[n,r,i] = - gsyn * g[n,r,i] * (v[n,i]-E_rev)/ (1.0f0 + (mg / b) * SNN.exp32(k * v[n,i]))
+#     #                 curr[n,r,i] = - gsyn * g[n,r,i] * (v[n,i]-E_rev)/ (1.0f0 + (mg / b) * SNN.exp(k * v[n,i]))
 #     #             else
 #     #                 curr[n,r,i] = - gsyn * g[n,r,i] * (v[n,i]-E_rev)
 #     #             end
