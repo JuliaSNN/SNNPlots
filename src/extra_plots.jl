@@ -57,7 +57,7 @@ function dendrite_gplot(
                 if nmda > 0.0
                     curr[n, r, i] =
                         -gsyn * g[n, r, i] * (v[n, i] - E_rev) /
-                        (1.0f0 + (mg / b) * SNN.exp32(k * v[n, i]))
+                        (1.0f0 + (mg / b) * SNN.exp(k * v[n, i]))
                 else
                     curr[n, r, i] = -gsyn * g[n, r, i] * (v[n, i] - E_rev)
                 end
@@ -130,6 +130,48 @@ function soma_gplot(population; neuron = 1, r, param = :soma_syn, ax = plot(), k
     hline!([0.0], c = :black, label = "")
     plot!(; kwargs...)
 end
+
+function gplot!(ax, population; ge_sym=:ge, gi_sym=:gi, v_sym=:v, 
+                        Ei_rev=-70, Ee_rev=0,  
+                        gsyn_e=1, gsyn_i=1,
+                        neurons = nothing, kwargs...)
+
+    v, r_v = SNN.interpolated_record(population, v_sym)
+    ge, r_v = SNN.interpolated_record(population, ge_sym)
+    gi, r_v = SNN.interpolated_record(population, gi_sym)
+
+    neurons = isnothing(neurons) ? eachindex(population.N) : neurons
+    r = _match_r(nothing, r_v)
+    v = Float32.(v[neurons, r])
+    ge = Float32.(ge[neurons, r])
+    gi = Float32.(gi[neurons, r])
+
+    @assert length(axes(ge, 1)) == length(axes(v, 1))
+    @assert length(axes(ge, 2)) == length(axes(v, 2))
+    curr = zeros(size(ge, 1), 2, size(ge, 2))
+
+    r = _match_r(r, r_v)
+    for i in axes(ge, 2)
+        for n in axes(ge, 1)
+            curr[n, 1, i] = -gsyn_e * ge[n, i] * (v[n, i] - Ee_rev)
+            curr[n, 2, i] = -gsyn_i * gi[n, i] * (v[n, i] - Ei_rev)
+        end
+    end
+    curr .= curr ./ 1000
+
+    plot!(ax, r, curr[:, 1, :]', label = "Glu")
+    plot!(r, curr[:, 2, :]', label = "GABA")
+    ylims = abs.(maximum(abs.(curr[:, 1, :]))) |> x -> (-x, x)
+    plot!(r, sum(curr, dims=2)[:,1,:]', label = "Total", c=:black)
+    plot!(ylims = ylims, xlabel = "Time (ms)", ylabel = "Syn. curr. (μA)")
+    hline!([0.0], c = :black, label = "")
+    plot!(; kwargs...)
+end
+
+gplot(pop; kwargs...) = gplot!(plot(), pop; kwargs...)
+
+export gplot
+
 """
     plot_activity(network, Trange)
 
@@ -807,7 +849,7 @@ export plot_network_plasticity, mutual_EI_connections
 #     #         @unpack gsyn, E_rev, nmda = syn[r]
 #     #         for n in axes(g,1)
 #     #             if nmda > 0.
-#     #                 curr[n,r,i] = - gsyn * g[n,r,i] * (v[n,i]-E_rev)/ (1.0f0 + (mg / b) * SNN.exp32(k * v[n,i]))
+#     #                 curr[n,r,i] = - gsyn * g[n,r,i] * (v[n,i]-E_rev)/ (1.0f0 + (mg / b) * SNN.exp(k * v[n,i]))
 #     #             else
 #     #                 curr[n,r,i] = - gsyn * g[n,r,i] * (v[n,i]-E_rev)
 #     #             end

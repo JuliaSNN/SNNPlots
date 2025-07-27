@@ -3,7 +3,7 @@ using .Plots
 ## Raster plot
 
 
-function raster(spiketimes::Spiketimes, t = nothing, kwargs...)
+function raster(spiketimes::Spiketimes, t = nothing; kwargs...)
     t = isnothing(t) ? [0, maximum(vcat(spiketimes...))] : t
     X, Y = _raster(spiketimes, t)
     X, Y = resample_spikes(X, Y)
@@ -16,6 +16,7 @@ function raster(spiketimes::Spiketimes, t = nothing, kwargs...)
         yaxis = ("Neuron",),
         label = "",
     )
+    t = typeof(t) <: AbstractRange ? t[[1, end]] : t
     !isnothing(t) && plot!(xlims = t)
     plot!(plt; kwargs...)
     return plt
@@ -32,12 +33,11 @@ function raster!(
     t = nothing;
     dt = 0.125ms,
     populations = nothing,
-    names = nothing,
+    # names = nothing,
     every = 1,
     order::Vector = [],
     kwargs...,
 )
-    t = t[[1, end]]
     if isnothing(populations)
         y0 = Int32[0]
         X = Float32[]
@@ -70,6 +70,7 @@ function raster!(
         yaxis = ("Neuron",),
         label = "",
     )
+    t = typeof(t) <: AbstractRange ? t[[1, end]] : t
     !isnothing(t) && plot!(xlims = t ./ s)
     plot!(yticks = (cumsum(y0)[1:(end-1)] .+ (y0 ./ 2)[2:end], names), yrotation = 45)
     y0 = y0[2:(end-1)]
@@ -128,7 +129,7 @@ function _raster(
     fire = p.records[:fire]
     x, y = Float32[], Float32[]
     y0 = Int32[]
-    # which time to plot
+    interval = typeof(interval) <: AbstractRange ? interval[[1,end]] : interval
     for i in eachindex(fire[:time])
         t = fire[:time][i]
         # which neurons to plot
@@ -175,8 +176,7 @@ vecplot!(    my_plot,    p,    sym::Symbol,    interval::T;) where {T<:AbstractR
 
 function _match_r(r, r_v)
     r = isnothing(r) ? range(r_v[1], r_v[end]) : r
-    r[end] > r_v[end] &&
-        throw(ArgumentError("The end time is greater than the record time"))
+    r[end] > r_v[end] && throw(ArgumentError("The end time is greater than the record time"))
     r[1] < r_v[1] && throw(ArgumentError("The start time is less than the record time"))
     return r
 end
@@ -191,13 +191,13 @@ function vecplot!(
     r = nothing,
     sym_id = nothing,
     factor = 1.0f0,
+    add_spikes = false,
     kwargs...,
 )
     # get the record and its sampling rate
     y, r_v = interpolated_record(p, sym)
     r = isnothing(interval) ? r : interval
     r = _match_r(r, r_v)
-
 
     neurons = isnothing(neurons) ? axes(y, 1) : neurons
     neurons = isa(neurons, Int) ? [neurons] : neurons
@@ -214,11 +214,34 @@ function vecplot!(
         y = y[neurons, r]
     end
 
+    if isa(factor, Symbol)
+        factor, r_factor = SNN.interpolated_record(p, sym)
+        factor = factor[neurons, r]
+    elseif isa(factor, Matrix)
+        factor = factor[neurons, :]
+        @assert size(factor, 1) == length(neurons) "The factor matrix must have the same number of rows as the number of neurons"
+        @assert size(factor, 2) == size(y, 2) "The factor matrix must have the same number of columns as the number of time points in the record"
+    end
+
+
     ribbon = pop_average ? SNNBase.Statistics.std(y, dims = 1) : nothing
     y = pop_average ? SNNBase.Statistics.mean(y, dims = 1) : y
 
+    if add_spikes
+        @assert haskey(p.records, :fire) "No fire record found in population $(p.name)"
+        spiketimes = SNN.spiketimes(p)
+        @assert length(spiketimes) == size(y, 1) "The number of spiketimes $(length(spiketimes)) does not match the number of neurons $(size(y, 1)) in population $(p.name)"
+        for n in eachindex(spiketimes)
+            for sp in spiketimes[n]
+                tt =  findfirst(r .>= sp)
+                isnothing(tt) && continue
+                y[n, tt] = 20mV
+            end
+        end
+    end
+
     @info "Vector plot in: $(r[1])ms to $(round(Int, r[end]))ms"
-    return plot!(
+    plot!(
         my_plot,
         r ./ 1000,
         y' .* factor,
@@ -227,6 +250,9 @@ function vecplot!(
         xaxis = ("t", extrema(r ./ 1000)),
         yaxis = (string(sym), extrema(y));
         lw = 3,
+        kwargs...,
+    )
+    return     plot!(;
         kwargs...,
     )
 end
