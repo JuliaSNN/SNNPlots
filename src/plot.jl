@@ -224,8 +224,8 @@ function vecplot!(
     end
 
 
-    ribbon = pop_average ? SNNBase.Statistics.std(y, dims = 1) : nothing
-    y = pop_average ? SNNBase.Statistics.mean(y, dims = 1) : y
+    ribbon = pop_average ? SNNModels.Statistics.std(y, dims = 1) : nothing
+    y = pop_average ? SNNModels.Statistics.mean(y, dims = 1) : y
 
     if add_spikes
         @assert haskey(p.records, :fire) "No fire record found in population $(p.name)"

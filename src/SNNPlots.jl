@@ -4,8 +4,8 @@ using Plots
 using ColorSchemes
 using LaTeXStrings
 using Measures
-using SNNBase
-import SNNBase: AbstractPopulation, AbstractStimulus, AbstractConnection
+using SNNModels
+import SNNModels: AbstractPopulation, AbstractStimulus, AbstractConnection
 using UnPack
 using Parameters
 @load_units
