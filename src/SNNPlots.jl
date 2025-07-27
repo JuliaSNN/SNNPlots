@@ -4,24 +4,16 @@ using Plots
 using ColorSchemes
 using LaTeXStrings
 using Measures
-using SpikingNeuralNetworks
-import SpikingNeuralNetworks: AbstractPopulation, AbstractStimulus, AbstractConnection
+using SNNBase
+import SNNBase: AbstractPopulation, AbstractStimulus, AbstractConnection
 using UnPack
 using Parameters
-SNN.@load_units
+@load_units
 
 include("plot.jl")
 include("extra_plots.jl")
 include("stdp_plots.jl")
 include("spatial.jl")
-
-# include("conversion.jl")
-# include("utils.jl")
-# include("default_plots.jl")
-# include("src/utils.jl")
-# include("src/raster.jl")
-# include("src/recognition.jl")
-# include("src/populations.jl")
 
 default(fg_legend = :transparent)
 default(bg_legend = :transparent)

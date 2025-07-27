@@ -6,7 +6,7 @@ using .Plots
 function raster(spiketimes::Spiketimes, t = nothing, kwargs...)
     t = isnothing(t) ? [0, maximum(vcat(spiketimes...))] : t
     X, Y = _raster(spiketimes, t)
-    X, Y = SNN.resample_spikes(X, Y)
+    X, Y = resample_spikes(X, Y)
     plt = scatter(
         X,
         Y,
@@ -57,7 +57,7 @@ function raster!(
         names = isnothing(names) ? ["pop_$i" for i = 1:length(P)] : names
     end
 
-    X, Y = SNN.resample_spikes(X, Y)
+    X, Y = resample_spikes(X, Y)
     X = X ./ s
 
     plt = scatter!(
@@ -194,7 +194,7 @@ function vecplot!(
     kwargs...,
 )
     # get the record and its sampling rate
-    y, r_v = SNN.interpolated_record(p, sym)
+    y, r_v = interpolated_record(p, sym)
     r = isnothing(interval) ? r : interval
     r = _match_r(r, r_v)
 
@@ -214,8 +214,8 @@ function vecplot!(
         y = y[neurons, r]
     end
 
-    ribbon = pop_average ? SNN.Statistics.std(y, dims = 1) : nothing
-    y = pop_average ? SNN.Statistics.mean(y, dims = 1) : y
+    ribbon = pop_average ? SNNBase.Statistics.std(y, dims = 1) : nothing
+    y = pop_average ? SNNBase.Statistics.mean(y, dims = 1) : y
 
     @info "Vector plot in: $(r[1])ms to $(round(Int, r[end]))ms"
     return plot!(
@@ -294,7 +294,7 @@ function if_curve(model, current; neuron = 1, dt = 0.1ms, duration = 1second)
     for I in current
         clear_records!(E)
         E.I = [I]
-        SNN.sim!([E], []; dt = dt, duration = duration)
+        sim!([E], []; dt = dt, duration = duration)
         push!(f, activity(E))
     end
     plot(current, f)
