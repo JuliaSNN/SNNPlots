@@ -176,8 +176,7 @@ vecplot!(    my_plot,    p,    sym::Symbol,    interval::T;) where {T<:AbstractR
 
 function _match_r(r, r_v)
     r = isnothing(r) ? range(r_v[1], r_v[end]) : r
-    r[end] > r_v[end] &&
-        throw(ArgumentError("The end time is greater than the record time"))
+    r[end] > r_v[end] && throw(ArgumentError("The end time is greater than the record time"))
     r[1] < r_v[1] && throw(ArgumentError("The start time is less than the record time"))
     return r
 end
@@ -215,6 +214,16 @@ function vecplot!(
         y = y[neurons, r]
     end
 
+    if isa(factor, Symbol)
+        factor, r_factor = SNN.interpolated_record(p, sym)
+        factor = factor[neurons, r]
+    elseif isa(factor, Matrix)
+        factor = factor[neurons, :]
+        @assert size(factor, 1) == length(neurons) "The factor matrix must have the same number of rows as the number of neurons"
+        @assert size(factor, 2) == size(y, 2) "The factor matrix must have the same number of columns as the number of time points in the record"
+    end
+
+
     ribbon = pop_average ? SNN.Statistics.std(y, dims = 1) : nothing
     y = pop_average ? SNN.Statistics.mean(y, dims = 1) : y
 
@@ -232,7 +241,7 @@ function vecplot!(
     end
 
     @info "Vector plot in: $(r[1])ms to $(round(Int, r[end]))ms"
-    return plot!(
+    plot!(
         my_plot,
         r ./ 1000,
         y' .* factor,
@@ -241,6 +250,9 @@ function vecplot!(
         xaxis = ("t", extrema(r ./ 1000)),
         yaxis = (string(sym), extrema(y));
         lw = 3,
+        kwargs...,
+    )
+    return     plot!(;
         kwargs...,
     )
 end
