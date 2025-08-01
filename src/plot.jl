@@ -1,4 +1,4 @@
-using .Plots 
+using .Plots
 import SNNModels: interpolated_record, resample_spikes
 ## Raster plot
 
@@ -102,7 +102,7 @@ function _raster_populations(
     return x, y, y0
 end
 
-function _raster(spiketimes::Spiketimes, t = nothing; order=[])
+function _raster(spiketimes::Spiketimes, t = nothing; order = [])
     t, X, Y = t[[1, end]], Float32[], Float32[]
     order = isempty(order) ? eachindex(spiketimes) : order
     for n in order
@@ -123,20 +123,20 @@ end
 function _raster(
     p::T,
     interval = nothing;
-    order=[]
+    order = [],
 ) where {T<:Union{AbstractPopulation,AbstractStimulus}}
     !haskey(p.records, :fire) && @error "No fire record found in population $(p.name)"
     fire = p.records[:fire]
     x, y = Float32[], Float32[]
     y0 = Int32[]
-    interval = typeof(interval) <: AbstractRange ? interval[[1,end]] : interval
+    interval = typeof(interval) <: AbstractRange ? interval[[1, end]] : interval
     for i in eachindex(fire[:time])
         t = fire[:time][i]
         # which neurons to plot
         for n in fire[:neurons][i]
             if isnothing(interval) || (t > interval[1] && t < interval[2])
                 push!(x, t)
-                if !isempty(order) 
+                if !isempty(order)
                     push!(y, indexin(n, order)[1])
                 else
                     push!(y, n)
@@ -168,15 +168,18 @@ function vecplot(P::Array, sym; kwargs...)
     plot(plts..., size = (600, 400N), layout = (N, 1))
 end
 
-vecplot(p, sym, interval::T; kwargs...) where {T<:AbstractRange} = vecplot(p, sym; interval = interval, kwargs...) 
+vecplot(p, sym, interval::T; kwargs...) where {T<:AbstractRange} =
+    vecplot(p, sym; interval = interval, kwargs...)
 
-vecplot!(    my_plot,    p,    sym::Symbol,    interval::T;) where {T<:AbstractRange} = vecplot!(    my_plot, p,    sym;    interval = interval,    kwargs...) 
+vecplot!(my_plot, p, sym::Symbol, interval::T;) where {T<:AbstractRange} =
+    vecplot!(my_plot, p, sym; interval = interval, kwargs...)
 
 
 
 function _match_r(r, r_v)
     r = isnothing(r) ? range(r_v[1], r_v[end]) : r
-    r[end] > r_v[end] && throw(ArgumentError("The end time is greater than the record time"))
+    r[end] > r_v[end] &&
+        throw(ArgumentError("The end time is greater than the record time"))
     r[1] < r_v[1] && throw(ArgumentError("The start time is less than the record time"))
     return r
 end
@@ -233,7 +236,7 @@ function vecplot!(
         @assert length(spiketimes) == size(y, 1) "The number of spiketimes $(length(spiketimes)) does not match the number of neurons $(size(y, 1)) in population $(p.name)"
         for n in eachindex(spiketimes)
             for sp in spiketimes[n]
-                tt =  findfirst(r .>= sp)
+                tt = findfirst(r .>= sp)
                 isnothing(tt) && continue
                 y[n, tt] = 20mV
             end
@@ -252,9 +255,7 @@ function vecplot!(
         lw = 3,
         kwargs...,
     )
-    return     plot!(;
-        kwargs...,
-    )
+    return plot!(; kwargs...)
 end
 
 function vecplot(P, syms::Array; kwargs...)

@@ -131,10 +131,19 @@ function soma_gplot(population; neuron = 1, r, param = :soma_syn, ax = plot(), k
     plot!(; kwargs...)
 end
 
-function gplot!(ax, population; ge_sym=:ge, gi_sym=:gi, v_sym=:v, 
-                        Ei_rev=-70, Ee_rev=0,  
-                        gsyn_e=1, gsyn_i=1,
-                        neurons = nothing, kwargs...)
+function gplot!(
+    ax,
+    population;
+    ge_sym = :ge,
+    gi_sym = :gi,
+    v_sym = :v,
+    Ei_rev = -70,
+    Ee_rev = 0,
+    gsyn_e = 1,
+    gsyn_i = 1,
+    neurons = nothing,
+    kwargs...,
+)
 
     v, r_v = SNN.interpolated_record(population, v_sym)
     ge, r_v = SNN.interpolated_record(population, ge_sym)
@@ -162,7 +171,7 @@ function gplot!(ax, population; ge_sym=:ge, gi_sym=:gi, v_sym=:v,
     plot!(ax, r, curr[:, 1, :]', label = "Glu")
     plot!(r, curr[:, 2, :]', label = "GABA")
     ylims = abs.(maximum(abs.(curr[:, 1, :]))) |> x -> (-x, x)
-    plot!(r, sum(curr, dims=2)[:,1,:]', label = "Total", c=:black)
+    plot!(r, sum(curr, dims = 2)[:, 1, :]', label = "Total", c = :black)
     plot!(ylims = ylims, xlabel = "Time (ms)", ylabel = "Syn. curr. (μA)")
     hline!([0.0], c = :black, label = "")
     plot!(; kwargs...)
