@@ -1,5 +1,5 @@
 using .Plots 
-
+import SNNModels: interpolated_record, resample_spikes
 ## Raster plot
 
 
